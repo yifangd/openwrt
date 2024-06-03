@@ -228,22 +228,6 @@ endef
 $(eval $(call KernelPackage,google-firmware))
 
 
-define KernelPackage/gpio-f7188x
-  SUBMENU:=$(OTHER_MENU)
-  TITLE:=Fintek F718xx/F818xx GPIO Support
-  DEPENDS:=@GPIO_SUPPORT @TARGET_x86
-  KCONFIG:=CONFIG_GPIO_F7188X
-  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-f7188x.ko
-  AUTOLOAD:=$(call AutoProbe,gpio-f7188x)
-endef
-
-define KernelPackage/gpio-f7188x/description
-  Kernel module for the GPIOs found on many Fintek Super-IO chips.
-endef
-
-$(eval $(call KernelPackage,gpio-f7188x))
-
-
 define KernelPackage/lkdtm
   SUBMENU:=$(OTHER_MENU)
   TITLE:=Linux Kernel Dump Test Tool Module
@@ -258,6 +242,92 @@ define KernelPackage/lkdtm/description
 endef
 
 $(eval $(call KernelPackage,lkdtm))
+
+
+define KernelPackage/mlx_wdt
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Mellanox Watchdog
+  DEPENDS:=@TARGET_x86 +kmod-regmap-core
+  KCONFIG:= \
+	CONFIG_MELLANOX_PLATFORM=y \
+	CONFIG_MLX_WDT
+  FILES:=$(LINUX_DIR)/drivers/watchdog/mlx_wdt.ko
+  AUTOLOAD:=$(call AutoProbe,mlx_wdt)
+endef
+
+define KernelPackage/mlx_wdt/description
+  This is the driver for the hardware watchdog on Mellanox systems.
+  This driver can be used together with the watchdog daemon.
+  It can also watch your kernel to make sure it doesn't freeze,
+  and if it does, it reboots your system after a certain amount of
+  time.
+endef
+
+$(eval $(call KernelPackage,mlx_wdt))
+
+
+define KernelPackage/mlxreg
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Mellanox platform register access
+  DEPENDS:=@TARGET_x86 +kmod-i2c-mux-mlxcpld
+  KCONFIG:= \
+	CONFIG_MELLANOX_PLATFORM=y \
+	CONFIG_MLX_PLATFORM \
+	CONFIG_MLXREG_HOTPLUG \
+	CONFIG_MLXREG_IO \
+	CONFIG_SENSORS_MLXREG_FAN \
+	CONFIG_LEDS_MLXREG
+  FILES:= \
+	$(LINUX_DIR)/drivers/platform/x86/mlx-platform.ko \
+	$(LINUX_DIR)/drivers/platform/mellanox/mlxreg-hotplug.ko \
+	$(LINUX_DIR)/drivers/platform/mellanox/mlxreg-io.ko \
+	$(LINUX_DIR)/drivers/hwmon/mlxreg-fan.ko \
+	$(LINUX_DIR)/drivers/leds/leds-mlxreg.ko
+  AUTOLOAD:=$(call AutoProbe,mlx-platform mlxreg-hotplug mlxreg-io mlxreg-fan leds-mlxreg)
+endef
+
+define KernelPackage/mlxreg/description
+  Allows access to Mellanox programmable device register
+  space through sysfs interface. The sets of registers for sysfs access
+  are defined per system type bases and include the registers related
+  to system resets operation, system reset causes monitoring and some
+  kinds of mux selection.
+endef
+
+$(eval $(call KernelPackage,mlxreg))
+
+
+define KernelPackage/mlxreg-lc
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Mellanox line card platform support
+  DEPENDS:=kmod-mlxreg +kmod-regmap-i2c
+  KCONFIG:=CONFIG_MLXREG_LC
+  FILES:=$(LINUX_DIR)/drivers/platform/mellanox/mlxreg-lc.ko
+  AUTOLOAD:=$(call AutoProbe,mlxreg-lc)
+endef
+
+define KernelPackage/mlxreg-lc/description
+  Provides support for the Mellanox MSN4800-XX line cards,
+  which are the part of MSN4800 Ethernet modular switch systems.
+endef
+
+$(eval $(call KernelPackage,mlxreg-lc))
+
+
+define KernelPackage/mlxreg-sn2201
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Nvidia SN2201 platform support
+  DEPENDS:=kmod-mlxreg +kmod-regmap-i2c
+  KCONFIG:=CONFIG_NVSW_SN2201
+  FILES:=$(LINUX_DIR)/drivers/platform/mellanox/nvsw-sn2201.ko
+  AUTOLOAD:=$(call AutoProbe,nvsw-sn2201)
+endef
+
+define KernelPackage/mlxreg-sn2201/description
+  Provides support for the Nvidia SN2201 platform.
+endef
+
+$(eval $(call KernelPackage,mlxreg-sn2201))
 
 
 define KernelPackage/pinctrl-mcp23s08
@@ -310,87 +380,6 @@ define KernelPackage/pinctrl-mcp23s08-spi/description
 endef
 
 $(eval $(call KernelPackage,pinctrl-mcp23s08-spi))
-
-
-define KernelPackage/gpio-nxp-74hc164
-  SUBMENU:=$(OTHER_MENU)
-  TITLE:=NXP 74HC164 GPIO expander support
-  KCONFIG:=CONFIG_GPIO_74X164
-  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-74x164.ko
-  AUTOLOAD:=$(call AutoProbe,gpio-74x164)
-endef
-
-define KernelPackage/gpio-nxp-74hc164/description
- Kernel module for NXP 74HC164 GPIO expander
-endef
-
-$(eval $(call KernelPackage,gpio-nxp-74hc164))
-
-define KernelPackage/gpio-pca953x
-  SUBMENU:=$(OTHER_MENU)
-  DEPENDS:=@GPIO_SUPPORT +kmod-i2c-core +kmod-regmap-i2c
-  TITLE:=PCA95xx, TCA64xx, and MAX7310 I/O ports
-  KCONFIG:=CONFIG_GPIO_PCA953X
-  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-pca953x.ko
-  AUTOLOAD:=$(call AutoLoad,55,gpio-pca953x)
-endef
-
-define KernelPackage/gpio-pca953x/description
- Kernel module for MAX731{0,2,3,5}, PCA6107, PCA953{4-9}, PCA955{4-7},
- PCA957{4,5} and TCA64{08,16} I2C GPIO expanders
-endef
-
-$(eval $(call KernelPackage,gpio-pca953x))
-
-define KernelPackage/gpio-pcf857x
-  SUBMENU:=$(OTHER_MENU)
-  DEPENDS:=@GPIO_SUPPORT +kmod-i2c-core
-  TITLE:=PCX857x, PCA967x and MAX732X I2C GPIO expanders
-  KCONFIG:=CONFIG_GPIO_PCF857X
-  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-pcf857x.ko
-  AUTOLOAD:=$(call AutoLoad,55,gpio-pcf857x)
-endef
-
-define KernelPackage/gpio-pcf857x/description
- Kernel module for PCF857x, PCA{85,96}7x, and MAX732[89] I2C GPIO expanders
-endef
-
-$(eval $(call KernelPackage,gpio-pcf857x))
-
-
-define KernelPackage/gpio-it87
-  SUBMENU:=$(OTHER_MENU)
-  DEPENDS:=@GPIO_SUPPORT @TARGET_x86
-  TITLE:=GPIO support for IT87xx Super I/O chips
-  KCONFIG:=CONFIG_GPIO_IT87
-  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-it87.ko
-  AUTOLOAD:=$(call AutoLoad,25,gpio-it87,1)
-endef
-
-define KernelPackage/gpio-it87/description
-  This driver is tested with ITE IT8728 and IT8732 Super I/O chips, and
-  supports the IT8761E, IT8613, IT8620E, and IT8628E Super I/O chips as
-  well.
-endef
-
-$(eval $(call KernelPackage,gpio-it87))
-
-
-define KernelPackage/gpio-amd-fch
-  SUBMENU:=$(OTHER_MENU)
-  DEPENDS:=@GPIO_SUPPORT @TARGET_x86
-  TITLE:=GPIO support for AMD Fusion Controller Hub (G-series SOCs)
-  KCONFIG:=CONFIG_GPIO_AMD_FCH
-  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-amd-fch.ko
-  AUTOLOAD:=$(call AutoLoad,25,gpio-amd-fch,1)
-endef
-
-define KernelPackage/gpio-amd-fch/description
-  This option enables driver for GPIO on AMDs Fusion Controller Hub,
-  as found on G-series SOCs (eg. GX-412TC)
-endef
-
-$(eval $(call KernelPackage,gpio-amd-fch))
 
 
 define KernelPackage/ppdev
@@ -673,6 +662,23 @@ define KernelPackage/rtc-isl1208/description
 endef
 
 $(eval $(call KernelPackage,rtc-isl1208))
+
+
+define KernelPackage/rtc-mv
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Marvell SoC RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  KCONFIG:=CONFIG_RTC_DRV_MV \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-mv.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-mv)
+endef
+
+define KernelPackage/rtc-mv/description
+ Kernel module for Marvell SoC RTC.
+endef
+
+$(eval $(call KernelPackage,rtc-mv))
 
 
 define KernelPackage/rtc-pcf8563
@@ -1205,25 +1211,6 @@ define KernelPackage/thermal/description
 endef
 
 $(eval $(call KernelPackage,thermal))
-
-
-define KernelPackage/gpio-beeper
-  SUBMENU:=$(OTHER_MENU)
-  TITLE:=GPIO beeper support
-  DEPENDS:=+kmod-input-core
-  KCONFIG:= \
-	CONFIG_INPUT_MISC=y \
-	CONFIG_INPUT_GPIO_BEEPER
-  FILES:= \
-	$(LINUX_DIR)/drivers/input/misc/gpio-beeper.ko
-  AUTOLOAD:=$(call AutoLoad,50,gpio-beeper)
-endef
-
-define KernelPackage/gpio-beeper/description
- This enables playing beeps through an GPIO-connected buzzer
-endef
-
-$(eval $(call KernelPackage,gpio-beeper))
 
 
 define KernelPackage/echo

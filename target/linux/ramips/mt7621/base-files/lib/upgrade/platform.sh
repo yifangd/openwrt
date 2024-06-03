@@ -33,6 +33,11 @@ platform_do_upgrade() {
 			fw_setenv --lock / bootImage 0 || exit 1
 		fi
 		;;
+	iptime,ax2004m)
+		if [ "$(fw_printenv -n boot_from 2>/dev/null)" != "firmware1" ]; then
+			fw_setenv boot_from firmware1 || exit 1
+		fi
+		;;
 	mikrotik,ltap-2hnd|\
 	mikrotik,routerboard-750gr3|\
 	mikrotik,routerboard-760igs|\
@@ -66,8 +71,11 @@ platform_do_upgrade() {
 	dlink,covr-x1860-a1|\
 	dlink,dap-x1860-a1|\
 	dlink,dir-1960-a1|\
+        dlink,dir-2055-a1|\
+	dlink,dir-2150-a1|\
 	dlink,dir-2640-a1|\
 	dlink,dir-2660-a1|\
+	dlink,dir-3040-a1|\
 	dlink,dir-3060-a1|\
 	dlink,dir-853-a3|\
 	etisalat,s3|\
@@ -119,8 +127,15 @@ platform_do_upgrade() {
 	xiaomi,mi-router-cr6608|\
 	xiaomi,mi-router-cr6609|\
 	xiaomi,redmi-router-ac2100|\
+	z-router,zr-2660|\
 	zyxel,nwa50ax|\
 	zyxel,nwa55axe)
+		nand_do_upgrade "$1"
+		;;
+	elecom,wrc-x1800gs)
+		[ "$(fw_printenv -n bootmenu_delay)" != "0" ] || \
+			fw_setenv bootmenu_delay 3
+		iodata_mstc_set_flag "bootnum" "persist" "0x4" "1,2" "1"
 		nand_do_upgrade "$1"
 		;;
 	iodata,wn-ax1167gr2|\

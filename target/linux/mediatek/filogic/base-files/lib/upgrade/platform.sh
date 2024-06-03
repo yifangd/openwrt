@@ -1,4 +1,5 @@
 REQUIRE_IMAGE_METADATA=1
+RAMFS_COPY_BIN='fitblk'
 
 asus_initial_setup()
 {
@@ -67,7 +68,9 @@ platform_do_upgrade() {
 	smartrg,sdg-8612|\
 	smartrg,sdg-8614|\
 	smartrg,sdg-8622|\
-	smartrg,sdg-8632)
+	smartrg,sdg-8632|\
+	smartrg,sdg-8733|\
+	smartrg,sdg-8734)
 		CI_KERNPART="kernel"
 		CI_ROOTPART="rootfs"
 		emmc_do_upgrade "$1"
@@ -79,18 +82,27 @@ platform_do_upgrade() {
 		CI_KERNPART="linux"
 		nand_do_upgrade "$1"
 		;;
-	bananapi,bpi-r3)
-		local rootdev="$(cmdline_get_var root)"
-		rootdev="${rootdev##*/}"
-		rootdev="${rootdev%p[0-9]*}"
-		case "$rootdev" in
-		mmc*)
-			CI_ROOTDEV="$rootdev"
-			CI_KERNPART="production"
+	bananapi,bpi-r3|\
+	bananapi,bpi-r3-mini|\
+	bananapi,bpi-r4|\
+	bananapi,bpi-r4-poe|\
+	mediatek,mt7988a-rfb|\
+	jdcloud,re-cp-03|\
+	openwrt,one|\
+	tplink,tl-xdr4288|\
+	tplink,tl-xdr6086|\
+	tplink,tl-xdr6088|\
+	xiaomi,redmi-router-ax6000-ubootmod)
+		[ -e /dev/fit0 ] && fitblk /dev/fit0
+		[ -e /dev/fitrw ] && fitblk /dev/fitrw
+		bootdev="$(fitblk_get_bootdev)"
+		case "$bootdev" in
+		mmcblk*)
+			EMMC_KERN_DEV="/dev/$bootdev"
 			emmc_do_upgrade "$1"
 			;;
 		mtdblock*)
-			PART_NAME="fit"
+			PART_NAME="/dev/mtd${bootdev:8}"
 			default_do_upgrade "$1"
 			;;
 		ubiblock*)
@@ -111,12 +123,15 @@ platform_do_upgrade() {
 			;;
 		esac
 		;;
+	cudy,re3000-v1|\
 	cudy,wr3000-v1|\
 	yuncore,ax835)
 		default_do_upgrade "$1"
 		;;
 	glinet,gl-mt2500|\
-	glinet,gl-mt6000)
+	glinet,gl-mt6000|\
+	glinet,gl-x3000|\
+	glinet,gl-xe3000)
 		CI_KERNPART="kernel"
 		CI_ROOTPART="rootfs"
 		emmc_do_upgrade "$1"
@@ -124,13 +139,10 @@ platform_do_upgrade() {
 	h3c,magic-nx30-pro|\
 	jcg,q30-pro|\
 	mediatek,mt7981-rfb|\
+	netcore,n60|\
 	qihoo,360t7|\
-	tplink,tl-xdr4288|\
-	tplink,tl-xdr6086|\
-	tplink,tl-xdr6088|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
-	xiaomi,mi-router-wr30u-ubootmod|\
-	xiaomi,redmi-router-ax6000-ubootmod)
+	xiaomi,mi-router-wr30u-ubootmod)
 		CI_KERNPART="fit"
 		nand_do_upgrade "$1"
 		;;
@@ -155,6 +167,23 @@ platform_do_upgrade() {
 		CI_ROOTPART="ubi_rootfs"
                 nand_do_upgrade "$1"
                 ;;
+	unielec,u7981-01*)
+		local rootdev="$(cmdline_get_var root)"
+		rootdev="${rootdev##*/}"
+		rootdev="${rootdev%p[0-9]*}"
+		case "$rootdev" in
+		mmc*)
+			CI_ROOTDEV="$rootdev"
+			CI_KERNPART="kernel"
+			CI_ROOTPART="rootfs"
+			emmc_do_upgrade "$1"
+			;;
+		*)
+			CI_KERNPART="fit"
+			nand_do_upgrade "$1"
+			;;
+		esac
+		;;
 	*)
 		nand_do_upgrade "$1"
 		;;
@@ -171,6 +200,8 @@ platform_check_image() {
 
 	case "$board" in
 	bananapi,bpi-r3|\
+	bananapi,bpi-r4|\
+	bananapi,bpi-r4-poe|\
 	cmcc,rax3000m)
 		[ "$magic" != "d00dfeed" ] && {
 			echo "Invalid image type."
@@ -189,7 +220,6 @@ platform_check_image() {
 
 platform_copy_config() {
 	case "$(board_name)" in
-	bananapi,bpi-r3|\
 	cmcc,rax3000m)
 		case "$(cmdline_get_var root)" in
 		/dev/mmc*)
@@ -197,9 +227,28 @@ platform_copy_config() {
 			;;
 		esac
 		;;
+	bananapi,bpi-r3|\
+	bananapi,bpi-r3-mini|\
+	bananapi,bpi-r4|\
+	bananapi,bpi-r4-poe)
+		case "$(fitblk_get_bootdev)" in
+		mmcblk*)
+			emmc_copy_config
+			;;
+		esac
+		;;
 	acer,predator-w6|\
 	glinet,gl-mt2500|\
 	glinet,gl-mt6000|\
+	glinet,gl-x3000|\
+	glinet,gl-xe3000|\
+	jdcloud,re-cp-03|\
+	smartrg,sdg-8612|\
+	smartrg,sdg-8614|\
+	smartrg,sdg-8622|\
+	smartrg,sdg-8632|\
+	smartrg,sdg-8733|\
+	smartrg,sdg-8734|\
 	ubnt,unifi-6-plus)
 		emmc_copy_config
 		;;

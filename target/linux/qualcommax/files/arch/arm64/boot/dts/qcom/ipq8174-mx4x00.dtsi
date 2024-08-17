@@ -128,6 +128,8 @@
 	pinctrl-0 = <&mdio_pins>;
 	pinctrl-names = "default";
 	reset-gpios = <&tlmm 37 GPIO_ACTIVE_LOW>;
+	reset-delay-us = <10000>;
+	reset-post-delay-us = <50000>;
 
 	ethernet-phy-package@0 {
 		#address-cells = <1>;

@@ -1,3 +1,23 @@
+## About
+
+This is for Linksys LN1301/MX4300 router as [no official support](https://github.com/openwrt/openwrt/pull/16070) in OpenWrt yet. 
+Firmware images are generated from github action, with some
+extra kmods in packages.tar.gz.
+
+### Credit:
+
+- The OpenWrt project.
+- mx4300-dev:  Open source OpenWRT build, from [testuser7](https://github.com/testuser7/openwrt/tree/mx4300-dev). 
+- mx4300-nss:  NSS enabled build with proprietary driver, from [qosmio](https://github.com/qosmio/openwrt-ipq/tree/qualcommax-6.x-nss-mx4300)
+
+### Warning
+
+Auto build binaries, untested and no guarantee. USE AT YOUR OWN RISK.
+
+
+
+-------------------
+
 ![OpenWrt logo](include/logo.png)
 
 OpenWrt Project is a Linux operating system targeting embedded devices. Instead

@@ -58,4 +58,4 @@ jobs:
               uses: ncipollo/release-action@v1
               with:
                 tag: qualcommax-${{ env.SHA }}
-                artifacts: bin/targets/qualcommax/ipq807x/openwrt-qualcommax-ipq807x-*, bin/targets/qualcommax/ipq807x/openwrt-imagebuilder-qualcommax-ipq807x.*, bin/packages.tar.gz
+                artifacts: bin/targets/qualcommax/ipq807x/openwrt-qualcommax-ipq807x-*, bin/targets/qualcommax/ipq807x/openwrt-imagebuilder-qualcommax-ipq807x.*, bin/targets/qualcommax/ipq807x/sha256sums, bin/packages.tar.gz

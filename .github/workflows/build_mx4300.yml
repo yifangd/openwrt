@@ -1,6 +1,9 @@
 name: Build MX4300
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    branches:
+      - mx4300-dev
 
 jobs:
     build:

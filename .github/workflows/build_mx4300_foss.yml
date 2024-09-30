@@ -1,13 +1,10 @@
-name: Build MX4300
+name: Build MX4300 FOSS Image
 
-on: 
-  workflow_dispatch:
-    branches:
-      - mx4300-dev
+on: workflow_dispatch
 
 jobs:
     build:
-        name: Build MX4300 firmware images
+        name: Build MX4300 FOSS Images
         runs-on: ubuntu-latest
         permissions:
             contents: write
@@ -39,17 +36,14 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Import config
-              run: mv .config_mx4300 .config
-
             - name: Update feeds
-              run: make package/symlinks
+              run:  scripts/feeds update -a && scripts/feeds install -a
+
+            - name: Generate config
+              run:  sh genconfig.sh
 
             - name: Build firmware images
-              run: make -j$(($(nproc)+1)) download world
-
-            - name: Pack packages
-              run:  tar cvfz bin/packages.tar.gz bin/targets/qualcommax/ipq807x/packages/
+              run:  make -j$(($(nproc)+1)) world
 
             - name: Get SHA
               uses: benjlevesque/short-sha@v2.2
@@ -57,5 +51,5 @@ jobs:
             - name: Release
               uses: ncipollo/release-action@v1
               with:
-                tag: qualcommax-${{ env.SHA }}
-                artifacts: bin/targets/qualcommax/ipq807x/openwrt-qualcommax-ipq807x-*, bin/targets/qualcommax/ipq807x/openwrt-imagebuilder-qualcommax-ipq807x.*, bin/targets/qualcommax/ipq807x/sha256sums, bin/packages.tar.gz
+                tag: qualcommax-foss-${{ env.SHA }}
+                artifacts: bin/targets/qualcommax/ipq807x/openwrt-qualcommax-ipq807x-linksys_mx4300*, bin/targets/qualcommax/ipq807x/openwrt-imagebuilder-qualcommax-ipq807x.*, bin/targets/qualcommax/ipq807x/sha256sums

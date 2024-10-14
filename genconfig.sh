@@ -1,8 +1,10 @@
 #!/bin/sh
 
-wget -qO- https://downloads.openwrt.org/snapshots/targets/qualcommax/ipq807x/config.buildinfo | grep -v CONFIG_TARGET_DEVICE_ | grep -v CONFIG_TARGET_ALL_PROFILES | grep -v CONFIG_TARGET_MULTI_PROFILE > .config
+wget -qO- https://downloads.openwrt.org/snapshots/targets/qualcommax/ipq807x/config.buildinfo | grep -v CONFIG_TARGET_DEVICE_ | grep -v CONFIG_TARGET_ALL_PROFILES | grep -v CONFIG_TARGET_MULTI_PROFILE | grep -v CONFIG_DEVEL | grep -v CONFIG_SDK | grep -v CONFIG_MAKE_TOOLCHAIN > .config
+
 echo CONFIG_TARGET_ALL_PROFILES=n >> .config
 echo CONFIG_TARGET_MULTI_PROFILE=n >> .config
+
 echo CONFIG_IB=y >> .config
 echo CONFIG_IB_STANDALONE=y >> .config
 echo CONFIG_ALL_NONSHARED=y >> .config

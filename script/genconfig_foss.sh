@@ -7,7 +7,7 @@ else
   buildinfo="https://downloads.openwrt.org/snapshots/targets/qualcommax/ipq807x/config.buildinfo"
 fi
 
-wget $buildinfo -O - | grep -v CONFIG_TARGET_DEVICE_ | grep -v CONFIG_TARGET_ALL_PROFILES | grep -v CONFIG_TARGET_MULTI_PROFILE > .config
+wget $buildinfo -O - | grep -v CONFIG_TARGET_DEVICE_ | grep -v CONFIG_TARGET_ALL_PROFILES | grep -v CONFIG_TARGET_MULTI_PROFILE | grep -v CONFIG_BUILDBOT | grep -v CONFIG_REPRODUCIBLE_DEBUG_INFO | grep -v CONFIG_COLLECT_KERNEL_DEBUG | grep -v CONFIG_DEVEL | grep -v CONFIG_SDK | grep -v CONFIG_MAKE_TOOLCHAIN > .config
 
 echo "
 CONFIG_TARGET_ALL_PROFILES=n 
@@ -15,6 +15,7 @@ CONFIG_TARGET_MULTI_PROFILE=n
 CONFIG_TARGET_qualcommax_ipq807x_DEVICE_linksys_mx4300=y
 CONFIG_TARGET_DEVICE_qualcommax_ipq807x_DEVICE_linksys_mx4300=y
 CONFIG_TARGET_DEVICE_PACKAGES_qualcommax_ipq807x_DEVICE_linksys_mx4300=\"\"
+CONFIG_IB_STANDALONE=y
 CONFIG_PACKAGE_luci=y
 " >> .config
 

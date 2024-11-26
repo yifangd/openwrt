@@ -297,11 +297,22 @@
 	status = "okay";
 };
 
+&pio {
+	pwm0_pins: pwm0-pins {
+		mux {
+			groups = "pwm0";
+			function = "pwm";
+		};
+	};
+};
+
 &pwm {
 	status = "okay";
 };
 
 &fan {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm0_pins>;
 	pwms = <&pwm 0 50000>;
 	status = "okay";
 };
@@ -349,14 +360,14 @@
 				ubi-volume-ubootenv {
 					volname = "ubootenv";
 					nvmem-layout {
-						compatible = "u-boot,env-redundant-bool-layout";
+						compatible = "u-boot,env-redundant-bool";
 					};
 				};
 
 				ubi-volume-ubootenv2 {
 					volname = "ubootenv2";
 					nvmem-layout {
-						compatible = "u-boot,env-redundant-bool-layout";
+						compatible = "u-boot,env-redundant-bool";
 					};
 				};
 

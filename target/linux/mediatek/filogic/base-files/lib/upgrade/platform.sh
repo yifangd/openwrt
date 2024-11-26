@@ -70,6 +70,7 @@ platform_do_upgrade() {
 	bananapi,bpi-r4|\
 	bananapi,bpi-r4-poe|\
 	cmcc,rax3000m|\
+	gatonetworks,gdsp|\
 	h3c,magic-nx30-pro|\
 	jcg,q30-pro|\
 	jdcloud,re-cp-03|\
@@ -79,6 +80,7 @@ platform_do_upgrade() {
 	openwrt,one|\
 	netcore,n60|\
 	qihoo,360t7|\
+	routerich,ax3000-ubootmod|\
 	tplink,tl-xdr4288|\
 	tplink,tl-xdr6086|\
 	tplink,tl-xdr6088|\
@@ -90,6 +92,13 @@ platform_do_upgrade() {
 		fit_do_upgrade "$1"
 		;;
 	acer,predator-w6|\
+	acer,predator-w6d|\
+	acer,vero-w6m|\
+	arcadyan,mozart|\
+	glinet,gl-mt2500|\
+	glinet,gl-mt6000|\
+	glinet,gl-x3000|\
+	glinet,gl-xe3000|\
 	smartrg,sdg-8612|\
 	smartrg,sdg-8614|\
 	smartrg,sdg-8622|\
@@ -113,14 +122,6 @@ platform_do_upgrade() {
 	yuncore,ax835)
 		default_do_upgrade "$1"
 		;;
-	glinet,gl-mt2500|\
-	glinet,gl-mt6000|\
-	glinet,gl-x3000|\
-	glinet,gl-xe3000)
-		CI_KERNPART="kernel"
-		CI_ROOTPART="rootfs"
-		emmc_do_upgrade "$1"
-		;;
 	mercusys,mr90x-v1|\
 	tplink,re6000xd)
 		CI_UBIPART="ubi0"
@@ -130,13 +131,6 @@ platform_do_upgrade() {
 		CI_KERNPART="kernel0"
 		EMMC_ROOT_DEV="$(cmdline_get_var root)"
 		emmc_do_upgrade "$1"
-		;;
-	xiaomi,mi-router-ax3000t|\
-	xiaomi,mi-router-wr30u-stock|\
-	xiaomi,redmi-router-ax6000-stock)
-		CI_KERN_UBIPART=ubi_kernel
-		CI_ROOT_UBIPART=ubi
-		nand_do_upgrade "$1"
 		;;
 	unielec,u7981-01*)
 		local rootdev="$(cmdline_get_var root)"
@@ -154,6 +148,13 @@ platform_do_upgrade() {
 			nand_do_upgrade "$1"
 			;;
 		esac
+		;;
+	xiaomi,mi-router-ax3000t|\
+	xiaomi,mi-router-wr30u-stock|\
+	xiaomi,redmi-router-ax6000-stock)
+		CI_KERN_UBIPART=ubi_kernel
+		CI_ROOT_UBIPART=ubi
+		nand_do_upgrade "$1"
 		;;
 	*)
 		nand_do_upgrade "$1"
@@ -202,6 +203,9 @@ platform_copy_config() {
 		fi
 		;;
 	acer,predator-w6|\
+	acer,predator-w6d|\
+	acer,vero-w6m|\
+	arcadyan,mozart|\
 	glinet,gl-mt2500|\
 	glinet,gl-mt6000|\
 	glinet,gl-x3000|\

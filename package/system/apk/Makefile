@@ -5,16 +5,16 @@ PKG_RELEASE:=1
 
 PKG_SOURCE_URL=https://gitlab.alpinelinux.org/alpine/apk-tools.git
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2024-08-06
-PKG_SOURCE_VERSION:=54caa31be633efc5f655700b77af290124f71689
-PKG_MIRROR_HASH:=f3be762deac4f1469a4a2839691175e78019cb44295089befafa279a3390067c
+PKG_SOURCE_DATE:=2024-11-13
+PKG_SOURCE_VERSION:=e3464d096708b270138653ef93db59134bb24813
+PKG_MIRROR_HASH:=cc633e5c294c9d92391fba5537dfe2f12f82011b55d282beb0d5d7ceba212962
 
 PKG_VERSION=3.0.0_pre$(subst -,,$(PKG_SOURCE_DATE))
 
 PKG_MAINTAINER:=Paul Spooren <mail@aparcar.org>
 PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=LICENSE
-PKG_INSTALL:=1
+PKG_INSTALL:=2
 
 HOST_BUILD_PREFIX:=$(STAGING_DIR_HOST)
 HOST_BUILD_DEPENDS:=lua/host
@@ -36,6 +36,7 @@ define Package/apk-mbedtls
   $(Package/apk/default)
   TITLE += (mbedtls)
   DEPENDS +=+libmbedtls
+  DEFAULT:=y if USE_APK
   VARIANT:=mbedtls
   DEFAULT_VARIANT:=1
   CONFLICTS:=apk-openssl
@@ -51,22 +52,28 @@ endef
 MESON_HOST_VARS+=VERSION=$(PKG_VERSION)
 MESON_VARS+=VERSION=$(PKG_VERSION)
 
-MESON_HOST_ARGS += \
+MESON_COMMON_ARGS = \
 	-Dcompressed-help=false \
 	-Ddocs=disabled \
-	-Dcrypto_backend=openssl \
+	-Dhelp=enabled \
+	-Dlua_version=5.1 \
+	-Durl_backend=wget \
 	-Dzstd=false
+
+MESON_HOST_ARGS += \
+	$(MESON_COMMON_ARGS) \
+	-Dcrypto_backend=openssl
 
 MESON_ARGS += \
-	-Dlua_version=5.1 \
-	-Dcompressed-help=false \
-	-Ddocs=disabled \
-	-Durl_backend=wget \
-	-Dcrypto_backend=$(BUILD_VARIANT) \
-	-Dzstd=false
+	$(MESON_COMMON_ARGS) \
+	-Dcrypto_backend=$(BUILD_VARIANT)
 
-HOST_LDFLAGS += \
-	-Wl,-rpath $(STAGING_DIR_HOST)/lib
+define Package/apk/conffiles
+/etc/apk/repositories.d/customfeeds.list
+endef
+
+Package/apk-mbedtls/conffiles = $(Package/apk/conffiles)
+Package/apk-openssl/conffiles = $(Package/apk/conffiles)
 
 define Package/apk/default/install
 	$(INSTALL_DIR) $(1)/lib/apk/db
@@ -76,6 +83,9 @@ define Package/apk/default/install
 
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libapk.so.* $(1)/usr/lib/
+
+	$(INSTALL_DIR) $(1)/etc/apk/repositories.d
+	$(INSTALL_DATA) ./files/customfeeds.list $(1)/etc/apk/repositories.d/customfeeds.list
 endef
 
 Package/apk-mbedtls/install = $(Package/apk/default/install)

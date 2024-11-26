@@ -8,9 +8,9 @@ PKG_LICENSE_FILES:=
 
 PKG_SOURCE_URL:=https://github.com/openwrt/mt76
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2024-09-29
-PKG_SOURCE_VERSION:=680bc70f161fde0f167e2ae50c771be4775eb50a
-PKG_MIRROR_HASH:=bcdb95e40cfceba56a565ad6b6d9f92a122e7230d0f7f950b3d39e4280723cca
+PKG_SOURCE_DATE:=2024-10-28
+PKG_SOURCE_VERSION:=c246fa545119abe5097682316700f13c91399042
+PKG_MIRROR_HASH:=ff59d9588e6b114be8fe08013b55da975bc6bb4219b97b6fedb72246e9337c18
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 PKG_USE_NINJA:=0
@@ -318,7 +318,8 @@ endef
 define KernelPackage/mt7996e
   $(KernelPackage/mt76-default)
   TITLE:=MediaTek MT7996E wireless driver
-  DEPENDS+=@PCI_SUPPORT +kmod-mt76-connac +kmod-hwmon-core +@DRIVER_11AX_SUPPORT +@KERNEL_RELAY
+  DEPENDS+=@PCI_SUPPORT +kmod-mt76-connac +kmod-hwmon-core +@DRIVER_11AX_SUPPORT \
+  	   +@KERNEL_RELAY +@DRIVER_11BE_SUPPORT
   FILES:= $(PKG_BUILD_DIR)/mt7996/mt7996e.ko
   AUTOLOAD:=$(call AutoProbe,mt7996e)
 endef
@@ -363,7 +364,7 @@ define KernelPackage/mt7925-common
   $(KernelPackage/mt76-default)
   TITLE:=MediaTek MT7925 wireless driver common code
   HIDDEN:=1
-  DEPENDS+=+kmod-mt792x-common +@DRIVER_11AX_SUPPORT +kmod-hwmon-core
+  DEPENDS+=+kmod-mt792x-common +@DRIVER_11AX_SUPPORT +kmod-hwmon-core +@DRIVER_11BE_SUPPORT
   FILES:= $(PKG_BUILD_DIR)/mt7925/mt7925-common.ko
 endef
 
@@ -660,6 +661,7 @@ define KernelPackage/mt7992-firmware/install
 		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_dsp.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_eeprom.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_eeprom_2i5i.bin \
+		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_eeprom_2i5e.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_rom_patch.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_wa.bin \
 		$(PKG_BUILD_DIR)/firmware/mt7996/mt7992_wm.bin \
